@@ -27,7 +27,12 @@ import {
 } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Flower, LittleCat, WhaleCat } from "@/components/MibudgeMascots";
+import {
+  Flower,
+  LittleCat,
+  MascotFriends,
+  WhaleMascot,
+} from "@/components/MibudgeMascots";
 import "./landing.css";
 
 const rupiah = (value: number) =>
@@ -186,7 +191,7 @@ export default function Landing() {
           });
           ambient
             .to(
-              ".mb-hero-mascot .mascot-float",
+              ".mb-hero-mascot .mascot-whale",
               { y: -9, rotation: -1, transformOrigin: "50% 70%" },
               0,
             )
@@ -281,7 +286,7 @@ export default function Landing() {
         <div className="mb-container mb-nav">
           <Link href="/" className="mb-brand" aria-label="Mibudge, beranda">
             <span className="mb-brand-icon">
-              <WhaleCat cat={false} />
+              <WhaleMascot />
             </span>
             Mibudge<span className="mb-brand-dot">.</span>
           </Link>
@@ -437,7 +442,7 @@ export default function Landing() {
             <span className="mb-scene-spark" aria-hidden="true">
               ✧
             </span>
-            <WhaleCat className="mb-hero-mascot" />
+            <MascotFriends className="mb-hero-mascot" />
             <div className="mb-scene-caption">teman kecil, mimpi besar.</div>
             <button
               className="mb-motion-toggle"
@@ -743,7 +748,7 @@ export default function Landing() {
             </div>
             <div className="mb-closing-art">
               <Flower />
-              <WhaleCat />
+              <MascotFriends />
               <span className="mb-hand-note">kita mulai bareng, ya?</span>
             </div>
           </div>

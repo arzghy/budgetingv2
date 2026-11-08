@@ -8,10 +8,13 @@ colors:
   peach: "#f6c5c1"
   ink: "#293e32"
   paper: "#fffdf7"
-  whale-blue: "#93c9e8"
-  whale-belly: "#e8f6fc"
-  whale-outline: "#355d78"
-  whale-shade: "#72b1d6"
+  whale-blue: "#8fc9ef"
+  whale-belly: "#eaf7ff"
+  whale-outline: "#356383"
+  whale-shade: "#66b1df"
+  cat-cream: "#fff7e7"
+  cat-patch: "#f0c4a6"
+  cat-outline: "#785b51"
 typography:
   display:
     fontFamily: "Bricolage Grotesque, sans-serif"
@@ -31,11 +34,11 @@ omitted:
 
 ## Overview
 
-Indonesian personal budgeting for everyday spending, essentials and savings goals. The landing page is a brand surface: a personal money journal with original whale and cat companions, generous negative space, a playful typographic rhythm and practical examples. The signature is a cat riding a pastel blue whale beside a paper budget sheet. The user selected the four pastel colors and requested a feminine, appealing identity without template-like decoration.
+Indonesian personal budgeting for everyday spending, essentials and savings goals. The landing page is a brand surface: a personal money journal with original whale and cat companions, generous negative space, a playful typographic rhythm and practical examples. The signature is a round pastel blue whale and a seated cream-and-peach kitten, side by side near a paper budget sheet. They are independent characters with separate silhouettes and ground shadows; the cat must never sit on the whale. The user selected the four pastel colors and requested a feminine, appealing identity without template-like decoration.
 
 ## Colors
 
-Runtime ownership: the four palette tokens (`--rose`, `--sage`, `--cream`, `--peach`) live in `app/globals.css`; `app/landing.css` consumes them and owns landing-only `--mb-ink`, `--mb-muted`, `--mb-paper`, and `--mb-line`. Mascot SVGs inherit these variables. At the user’s request, the whale uses an illustration-only blue palette owned by `--mb-whale-blue`, `--mb-whale-belly`, `--mb-whale-outline`, and `--mb-whale-shade` in `app/landing.css`. Its rounded body, pale belly, curved flukes, pink cheeks, bright eyes and small water spout keep the character gentle and recognizably a whale. Pastels are surfaces; dark green carries legible text. App routes retain their existing ink tokens.
+Runtime ownership: the four palette tokens (`--rose`, `--sage`, `--cream`, `--peach`) live in `app/globals.css`; `app/landing.css` consumes them and owns landing-only `--mb-ink`, `--mb-muted`, `--mb-paper`, and `--mb-line`. Mascot SVGs inherit these variables. At the user’s request, the whale uses an illustration-only blue palette owned by `--mb-whale-blue`, `--mb-whale-belly`, `--mb-whale-outline`, and `--mb-whale-shade` in `app/landing.css`. Its short, rounded body, pale belly, raised flukes, pink cheeks, bright eyes, open smile and small water spout keep the character gentle and recognizably a whale. The cat uses `--mb-cat-cream`, `--mb-cat-patch`, and `--mb-cat-outline` from the same stylesheet, with a rounded face, peach ear patch, green collar, small paws and a curled tail. `CatFace` is shared between the full kitten and smaller cat decorations; `WhaleDrawing` is shared between the scene and the compact, uncropped navigation icon. Pastels are surfaces; dark green carries legible text. App routes retain their existing ink tokens.
 
 ## Typography
 
@@ -57,7 +60,7 @@ Pill buttons, irregular organic backdrop, handwritten underline, paper tape and 
 
 Primary actions navigate to existing `/register`; sign-in navigates to `/login`. Preserve authenticated redirect to `/dashboard`. Feature tabs support arrows/Home/End and display illustrative data only. Native range supports keyboard control; output updates in rupiah. FAQ uses native details/summary. Small-screen navigation is a non-modal disclosure with Escape support. Content remains visible if animation does not initialize.
 
-Motion personality: calm and playful. GSAP orchestrates one hero entrance, restrained whale motion, one notebook reveal and 250ms tab transitions. Primary mascot movement is supported by a small tail movement. Lenis uses the existing shared provider synchronized with GSAP, with cleanup and native scrolling under reduced-motion preferences. Ambient motion pauses offscreen and has a visible pause control. Avoid repeated section reveals and pinned scrolling.
+Motion personality: calm and playful. GSAP orchestrates one hero entrance, restrained whale motion, one notebook reveal and 250ms tab transitions. Only the independent whale group floats, supported by a small tail movement; the seated cat remains grounded beside it. Lenis uses the existing shared provider synchronized with GSAP, with cleanup and native scrolling under reduced-motion preferences. Ambient motion pauses offscreen and has a visible pause control. Avoid repeated section reveals and pinned scrolling.
 
 ## Do's and Don'ts
 
