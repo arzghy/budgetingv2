@@ -10,6 +10,10 @@
   --mb-muted: #566349;
   --mb-paper: #fffdf7;
   --mb-line: #293e3226;
+  --mb-whale-blue: #93c9e8;
+  --mb-whale-belly: #e8f6fc;
+  --mb-whale-outline: #355d78;
+  --mb-whale-shade: #72b1d6;
   --mb-display: "Bricolage Grotesque", var(--font-sans), sans-serif;
   background: var(--mb-paper);
   color: var(--mb-ink);

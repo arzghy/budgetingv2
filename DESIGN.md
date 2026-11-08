@@ -8,6 +8,10 @@ colors:
   peach: "#f6c5c1"
   ink: "#293e32"
   paper: "#fffdf7"
+  whale-blue: "#93c9e8"
+  whale-belly: "#e8f6fc"
+  whale-outline: "#355d78"
+  whale-shade: "#72b1d6"
 typography:
   display:
     fontFamily: "Bricolage Grotesque, sans-serif"
@@ -27,11 +31,11 @@ omitted:
 
 ## Overview
 
-Indonesian personal budgeting for everyday spending, essentials and savings goals. The landing page is a brand surface: a personal money journal with original whale and cat companions, generous negative space, a playful typographic rhythm and practical examples. The signature is a cat riding a green whale beside a paper budget sheet. The user selected the four pastel colors and requested a feminine, appealing identity without template-like decoration.
+Indonesian personal budgeting for everyday spending, essentials and savings goals. The landing page is a brand surface: a personal money journal with original whale and cat companions, generous negative space, a playful typographic rhythm and practical examples. The signature is a cat riding a pastel blue whale beside a paper budget sheet. The user selected the four pastel colors and requested a feminine, appealing identity without template-like decoration.
 
 ## Colors
 
-Runtime ownership: the four palette tokens (`--rose`, `--sage`, `--cream`, `--peach`) live in `app/globals.css`; `app/landing.css` consumes them and owns landing-only `--mb-ink`, `--mb-muted`, `--mb-paper`, and `--mb-line`. Mascot SVGs inherit these variables. Pastels are surfaces; dark green carries legible text. App routes retain their existing ink tokens.
+Runtime ownership: the four palette tokens (`--rose`, `--sage`, `--cream`, `--peach`) live in `app/globals.css`; `app/landing.css` consumes them and owns landing-only `--mb-ink`, `--mb-muted`, `--mb-paper`, and `--mb-line`. Mascot SVGs inherit these variables. At the user’s request, the whale uses an illustration-only blue palette owned by `--mb-whale-blue`, `--mb-whale-belly`, `--mb-whale-outline`, and `--mb-whale-shade` in `app/landing.css`. Its rounded body, pale belly, curved flukes, pink cheeks, bright eyes and small water spout keep the character gentle and recognizably a whale. Pastels are surfaces; dark green carries legible text. App routes retain their existing ink tokens.
 
 ## Typography
 

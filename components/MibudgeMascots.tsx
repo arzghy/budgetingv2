@@ -23,57 +23,90 @@ export function WhaleCat({
         opacity=".07"
       />
       <g className="mascot-float">
-        <g className="whale-tail">
+        <g
+          className="whale-tail"
+          stroke="var(--mb-whale-outline)"
+          strokeWidth="2.8"
+          strokeLinejoin="round"
+        >
           <path
-            d="M397 221C436 223 451 201 450 171C469 172 481 185 479 202C489 189 507 188 516 193C512 234 477 254 435 253L397 221Z"
-            fill="var(--sage)"
-            stroke="var(--mb-ink)"
-            strokeWidth="3"
-            strokeLinejoin="round"
+            d="M393 224C424 229 445 211 444 185C432 179 425 164 429 151C452 150 474 164 477 185C488 170 506 166 517 173C519 200 493 227 462 239C441 252 416 255 397 247Z"
+            fill="var(--mb-whale-blue)"
           />
+          <path d="M447 219C462 213 475 201 477 185" strokeLinecap="round" />
           <path
-            d="M455 219C464 215 473 210 479 202"
-            stroke="var(--mb-ink)"
-            strokeWidth="2.5"
+            d="M438 161C449 162 460 169 464 179"
+            stroke="var(--mb-whale-belly)"
+            strokeWidth="4"
             strokeLinecap="round"
           />
         </g>
         <path
-          d="M72 230C58 169 107 129 194 129C275 129 338 163 390 199C417 218 437 229 462 230C455 272 400 311 289 313C191 315 86 292 72 230Z"
-          fill="var(--sage)"
-          stroke="var(--mb-ink)"
-          strokeWidth="3"
+          d="M61 225C53 167 100 127 183 127C263 127 316 158 370 197C398 217 423 227 447 213C447 250 413 284 359 302C306 320 225 325 157 309C97 296 66 268 61 225Z"
+          fill="var(--mb-whale-blue)"
+          stroke="var(--mb-whale-outline)"
+          strokeWidth="2.8"
+          strokeLinejoin="round"
         />
         <path
-          d="M91 257C142 290 240 280 293 274C350 268 393 270 424 267C387 297 340 311 283 311C187 312 121 293 91 257Z"
-          fill="var(--cream)"
+          d="M72 251C110 278 166 282 224 280C305 279 381 276 430 245C412 272 388 289 359 300C302 319 225 324 158 308C117 299 89 278 72 251Z"
+          fill="var(--mb-whale-belly)"
         />
         <path
-          d="M228 244C237 262 257 286 282 278C288 264 273 247 258 240"
-          fill="var(--sage)"
-          stroke="var(--mb-ink)"
-          strokeWidth="3"
+          d="M312 202C343 218 371 231 399 232"
+          stroke="var(--mb-whale-shade)"
+          strokeWidth="7"
+          strokeLinecap="round"
+          opacity=".55"
+        />
+        <path
+          d="M218 246C239 242 265 257 273 276C278 287 272 294 261 291C242 287 222 271 218 257"
+          fill="var(--mb-whale-blue)"
+          stroke="var(--mb-whale-outline)"
+          strokeWidth="2.8"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <ellipse cx="124" cy="231" rx="17" ry="10" fill="var(--peach)" />
-        <ellipse cx="207" cy="235" rx="16" ry="9" fill="var(--peach)" />
-        <g className="mascot-eyes" fill="var(--mb-ink)">
-          <ellipse cx="137" cy="217" rx="5" ry="7" />
-          <ellipse cx="198" cy="220" rx="5" ry="7" />
+        <path
+          d="M232 255C244 259 255 269 260 277"
+          stroke="var(--mb-whale-belly)"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+        <ellipse cx="112" cy="235" rx="17" ry="10" fill="var(--peach)" />
+        <ellipse cx="199" cy="238" rx="16" ry="9" fill="var(--peach)" />
+        <g className="mascot-eyes" fill="var(--mb-whale-outline)">
+          <ellipse cx="126" cy="218" rx="6" ry="8" />
+          <ellipse cx="187" cy="220" rx="6" ry="8" />
+          <circle cx="128" cy="215" r="2" fill="var(--mb-whale-belly)" />
+          <circle cx="189" cy="217" r="2" fill="var(--mb-whale-belly)" />
         </g>
         <path
-          d="M159 230C164 239 173 239 179 231"
-          stroke="var(--mb-ink)"
+          d="M145 234C150 244 163 245 170 236"
+          stroke="var(--mb-whale-outline)"
           strokeWidth="3"
           strokeLinecap="round"
         />
         <path
-          d="M116 175C128 167 145 164 157 164"
-          stroke="var(--cream)"
+          d="M93 183C107 165 127 157 148 155"
+          stroke="var(--mb-whale-belly)"
           strokeWidth="7"
           strokeLinecap="round"
         />
+        <circle cx="83" cy="197" r="3.5" fill="var(--mb-whale-belly)" />
+        {cat && (
+          <g
+            fill="var(--mb-whale-blue)"
+            stroke="var(--mb-whale-outline)"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          >
+            <path d="M136 109C126 105 116 97 119 91C123 83 136 94 136 109Z" />
+            <path d="M146 101C143 91 145 78 151 79C160 81 154 95 146 101Z" />
+            <path d="M157 111C163 101 174 98 176 104C178 111 167 114 157 111Z" />
+            <path d="M144 118L145 126" fill="none" strokeLinecap="round" />
+          </g>
+        )}
         {cat && (
           <g className="mascot-cat">
             <path
@@ -149,7 +182,12 @@ export function WhaleCat({
           </g>
         )}
       </g>
-      <g stroke="var(--mb-ink)" strokeWidth="2" strokeLinecap="round">
+      <g
+        stroke="var(--mb-whale-outline)"
+        strokeWidth="2"
+        strokeLinecap="round"
+        opacity=".6"
+      >
         <path d="M64 294Q78 299 91 294M382 331Q400 337 415 331M50 265Q55 269 62 266" />
       </g>
     </svg>
