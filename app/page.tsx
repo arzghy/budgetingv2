@@ -1,262 +1,768 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+} from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useRef, useState } from "react";
-import Lottie from "lottie-react";
-import whaleSwim from "@/public/images/whale-swim.json";
+import {
+  ArrowDown,
+  ArrowUpRight,
+  Check,
+  Coffee,
+  Heart,
+  Menu,
+  Pause,
+  Play,
+  Plus,
+  ShoppingBag,
+  Sprout,
+  Wallet,
+  X,
+} from "lucide-react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Flower, LittleCat, WhaleCat } from "@/components/MibudgeMascots";
+import "./landing.css";
 
-const techStack: [string, string][] = [["Next.js", "/images/nextjs.png"], ["React", "/images/react.png"], ["Tailwind CSS", "/images/tailwind.png"], ["MongoDB", "/images/mongodb.png"], ["Mongoose", "/images/mongoose.png"]];
-
-function TypewriterEffectSmooth({ text }: { text: string }) {
-  const [visible, setVisible] = useState(0);
-
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setVisible(text.length);
-      return;
-    }
-
-    let cancelled = false;
-    let timer: number | undefined;
-    let current = 0;
-    let deleting = false;
-
-    const schedule = (delay: number) => {
-      timer = window.setTimeout(() => {
-        if (cancelled) return;
-        if (deleting) {
-          current -= 1;
-          setVisible(current);
-          if (current === 0) deleting = false;
-           schedule(10);
-
-        } else {
-          current += 1;
-          setVisible(current);
-          if (current === text.length) {
-            deleting = true;
-            schedule(3000);
-          } else {
-            schedule(10);
-          }
-        }
-      }, delay);
-    };
-
-    setVisible(0);
-    schedule(1);
-    return () => {
-      cancelled = true;
-      if (timer !== undefined) window.clearTimeout(timer);
-    };
-  }, [text]);
-
-  return <span>{text.slice(0, visible)}<span className="typewriter-caret" aria-hidden="true" /></span>;
-}
-
-const copy = {
-  id: {
-    login: "Masuk",
-    hero: "Uang harian, terlihat jelas dengan",
-    heroAccent: "Mibudge.",
-    intro: "Catat pengeluaran, rencanakan kebutuhan, dan lihat ruang anggaranmu dalam satu tempat.",
-    start: "Mulai mencatat",
-
-    how: "Tiga hal yang perlu terlihat.",
-    howIntro: "MiBudge menyusun informasi berdasarkan keputusan yang perlu kamu ambil hari ini.",
-    capabilities: [
-      ["Catat", "Pengeluaran, skincare, makeup, dan kebutuhan tetap terpisah tanpa terasa rumit."],
-      ["Rencanakan", "Simpan wishlist dan tabungan dengan target yang mudah dibaca."],
-      ["Pantau", "Lihat sisa anggaran, pembelian terbaru, dan kebutuhan yang harus diisi ulang."],
+const rupiah = (value: number) =>
+  new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(value);
+const features = [
+  {
+    title: "Jajan kecil juga punya tempat.",
+    description:
+      "Kopi, skincare, sampai ongkos pulang. Catat pengeluaran sesuai kategorinya, biar kamu tahu ke mana uangmu pergi.",
+    label: "Pengeluaran",
+    note: "Semua tercatat, tanpa menghakimi.",
+    heading: "Catatan hari ini",
+    rows: [
+      {
+        icon: Coffee,
+        name: "Matcha sore",
+        category: "Jajan",
+        amount: "Rp28.000",
+      },
+      {
+        icon: ShoppingBag,
+        name: "Sunscreen kesayangan",
+        category: "Skincare",
+        amount: "Rp89.000",
+      },
+      {
+        icon: Heart,
+        name: "Makan bareng teman",
+        category: "Hiburan",
+        amount: "Rp65.000",
+      },
     ],
-    flow: "Dari rencana ke catatan.",
-    flowIntro: "Saat kebutuhan habis atau wishlist dibeli, MiBudge membantu menjaga catatan tetap tersambung.",
-    steps: ["Masuk dengan akunmu", "Tambah catatan atau target", "Gunakan ringkasan untuk menentukan langkah berikutnya"],
-    close: "Mulai dari catatan pertama.",
-    closeIntro: "Tidak perlu menata semuanya sekaligus. Mulai dengan pengeluaran hari ini.",
-    footer: "MiBudge · budgeting personal",
+    totalLabel: "Total hari ini",
+    total: "Rp182.000",
   },
-  en: {
-    login: "Sign in",
-    hero: "See your daily money clearly with",
-    heroAccent: "Mibudge.",
-    intro: "Track spending, plan essentials, and understand your available budget in one place.",
-    start: "Start tracking",
-
-    how: "Three things worth seeing.",
-    howIntro: "MiBudge organizes information around the decisions you need to make today.",
-    capabilities: [
-      ["Track", "Keep expenses, skincare, makeup, and essentials distinct without extra friction."],
-      ["Plan", "Save wishlist items and savings goals with progress that is easy to read."],
-      ["Review", "See available budget, recent purchases, and essentials due for a refill."],
+  {
+    title: "Yang penting, nggak kelupaan.",
+    description:
+      "Pisahkan kebutuhan dari keinginan. Pantau barang yang masih ada dan yang sudah habis, supaya belanja berikutnya lebih terarah.",
+    label: "Kebutuhan",
+    note: "Belanja yang perlu, di waktu yang pas.",
+    heading: "Daftar kebutuhanku",
+    rows: [
+      {
+        icon: ShoppingBag,
+        name: "Sabun muka",
+        category: "Perawatan diri",
+        amount: "Masih ada",
+      },
+      {
+        icon: Coffee,
+        name: "Kopi di rumah",
+        category: "Dapur",
+        amount: "Perlu isi ulang",
+      },
+      {
+        icon: Heart,
+        name: "Vitamin harian",
+        category: "Kesehatan",
+        amount: "Masih ada",
+      },
     ],
-    flow: "From plan to record.",
-    flowIntro: "When an essential runs out or a wishlist item is purchased, MiBudge helps keep your records connected.",
-    steps: ["Sign in to your account", "Add a record or target", "Use the overview to decide what comes next"],
-    close: "Start with one record.",
-    closeIntro: "You do not need to organize everything at once. Start with today’s spending.",
-    footer: "MiBudge · personal budgeting",
+    totalLabel: "Saatnya belanja",
+    total: "1 kebutuhan",
   },
-};
+  {
+    title: "Mimpi kecil, dicicil pelan-pelan.",
+    description:
+      "Bikin wishlist, tentukan target, lalu catat tabunganmu. Lihat setiap langkah kecil membawamu makin dekat ke hal yang kamu inginkan.",
+    label: "Wishlist & tabungan",
+    note: "Nggak harus banyak. Yang penting mulai.",
+    heading: "Pelan-pelan, kesampaian",
+    rows: [
+      {
+        icon: ShoppingBag,
+        name: "Tas untuk kerja",
+        category: "Rp450.000 dari Rp750.000",
+        amount: "60%",
+      },
+      {
+        icon: Sprout,
+        name: "Liburan singkat",
+        category: "Rp600.000 dari Rp2.000.000",
+        amount: "30%",
+      },
+      {
+        icon: Heart,
+        name: "Dana jaga-jaga",
+        category: "Rp500.000 dari Rp1.000.000",
+        amount: "50%",
+      },
+    ],
+    totalLabel: "Sudah disisihkan",
+    total: "Rp1.550.000",
+  },
+];
+const questions = [
+  [
+    "Mibudge bisa bantu apa saja?",
+    "Mibudge membantu mencatat pengeluaran, mengelola kebutuhan, membuat wishlist, dan memantau tabungan. Catatan skincare dan makeup juga punya tempat sendiri, jadi lebih mudah dipantau.",
+  ],
+  [
+    "Harus jago mengatur uang dulu?",
+    "Nggak perlu. Mulai saja dari satu pengeluaran hari ini. Kamu bisa menambahkan kebutuhan dan target tabungan saat sudah siap.",
+  ],
+  [
+    "Apakah Mibudge terhubung ke rekening bank?",
+    "Tidak. Kamu memasukkan catatan pengeluaran dan tabungan secara manual. Mibudge tidak memindahkan uang atau melakukan transaksi di rekeningmu.",
+  ],
+  [
+    "Bagaimana cara mulai mencatat?",
+    "Buat akun, masuk ke dashboard, lalu tambahkan catatan pertamamu. Kamu bisa mengelompokkan pengeluaran dan membuat target sesuai kebutuhan.",
+  ],
+];
 
 export default function Landing() {
   const { status } = useSession();
   const router = useRouter();
-  const [lang, setLang] = useState<"id" | "en">("id");
-  const [floatingNav, setFloatingNav] = useState(false);
-  const heroTopRef = useRef<HTMLDivElement | null>(null);
-  const t = copy[lang];
+  const root = useRef<HTMLDivElement>(null);
+  const demo = useRef<HTMLDivElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [feature, setFeature] = useState(0);
+  const [income, setIncome] = useState(5000000);
+  const [paused, setPaused] = useState(false);
+  const pausedRef = useRef(false);
+  const sceneAnimation = useRef<gsap.core.Timeline | null>(null);
+  const selected = features[feature];
 
   useEffect(() => {
     if (status === "authenticated") router.replace("/dashboard");
   }, [router, status]);
 
   useEffect(() => {
-    const sentinel = heroTopRef.current;
-    if (!sentinel) return;
-    const observer = new IntersectionObserver(([entry]) => setFloatingNav(!entry.isIntersecting), { threshold: 0 });
-    observer.observe(sentinel);
-    return () => observer.disconnect();
+    gsap.registerPlugin(ScrollTrigger);
+    const media = gsap.matchMedia();
+    media.add(
+      "(prefers-reduced-motion: no-preference)",
+      () => {
+        const ctx = gsap.context(() => {
+          gsap
+            .timeline({ defaults: { ease: "power3.out", duration: 0.8 } })
+            .from(".mb-hero-copy > *", { y: 22, opacity: 0, stagger: 0.09 })
+            .from(
+              ".mb-scene",
+              { y: 32, rotation: -3, opacity: 0, duration: 1 },
+              0.2,
+            );
+          const ambient = gsap.timeline({
+            repeat: -1,
+            yoyo: true,
+            defaults: { ease: "sine.inOut", duration: 3.2 },
+          });
+          ambient
+            .to(
+              ".mb-hero-mascot .mascot-float",
+              { y: -9, rotation: -1, transformOrigin: "50% 70%" },
+              0,
+            )
+            .to(
+              ".mb-hero-mascot .whale-tail",
+              { rotation: 5, transformOrigin: "5% 80%" },
+              0,
+            );
+          sceneAnimation.current = ambient;
+          const observer = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting && !document.hidden && !pausedRef.current)
+              ambient.play();
+            else ambient.pause();
+          });
+          const hero = root.current?.querySelector(".mb-hero");
+          if (hero) observer.observe(hero);
+          const visibility = () => {
+            if (document.hidden) ambient.pause();
+            else if (
+              !pausedRef.current &&
+              hero &&
+              hero.getBoundingClientRect().bottom > 0
+            )
+              ambient.play();
+          };
+          document.addEventListener("visibilitychange", visibility);
+          gsap.from(".mb-notebook", {
+            rotation: -3,
+            y: 24,
+            duration: 0.9,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: ".mb-features",
+              start: "top 70%",
+              once: true,
+            },
+          });
+          return () => {
+            observer.disconnect();
+            document.removeEventListener("visibilitychange", visibility);
+          };
+        }, root);
+        return () => {
+          ctx.revert();
+          sceneAnimation.current = null;
+        };
+      },
+      root,
+    );
+    return () => media.revert();
   }, []);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      let ctx: { revert: () => void } | undefined;
-      let refreshFrame = 0;
-      let disposed = false;
-     void Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(([{ gsap }, { ScrollTrigger }]) => {
-       if (disposed) return;
-       gsap.registerPlugin(ScrollTrigger);
-       ctx = gsap.context(() => {
-          gsap.utils.toArray<HTMLElement>("section").forEach((section) => {
-           if (section.classList.contains("budget-route")) return;
+    pausedRef.current = paused;
+    sceneAnimation.current?.paused(paused);
+  }, [paused]);
+  useEffect(() => {
+    if (
+      !demo.current ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    )
+      return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        demo.current,
+        { y: 8, opacity: 0.4 },
+        { y: 0, opacity: 1, duration: 0.25, ease: "power2.out" },
+      );
+    });
+    return () => ctx.revert();
+  }, [feature]);
 
-           const content = section.firstElementChild;
-          if (!content) return;
-          gsap.from(content, {
-            opacity: 0,
-            y: 24,
-            duration: 0.7,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: section,
-              start: "top 85%",
-              once: true,
-              scrub: false,
-            },
-           });
-         });
-          const route = document.querySelector<HTMLElement>(".budget-route");
-           const routeTrack = route?.querySelector<HTMLElement>(".budget-route-track");
-           const routeWhale = route?.querySelector<HTMLElement>(".budget-route-whale");
-           if (route && routeTrack && routeWhale && window.matchMedia("(min-width: 768px)").matches) {
-             const viewport = routeTrack.parentElement!;
-             const distance = () => Math.max(0, routeTrack.scrollWidth - viewport.clientWidth);
-             const whaleDistance = () => Math.max(0, viewport.clientWidth - routeWhale.offsetWidth - 32);
-             gsap.timeline({
-               defaults: { ease: "none" },
-               scrollTrigger: {
-                 trigger: route,
-                 start: "top top",
-                 end: () => `+=${Math.max(window.innerWidth * 2.2, distance() + window.innerWidth * 0.7)}`,
-                 pin: true,
-                 pinType: "fixed",
-                 anticipatePin: 1,
-                 fastScrollEnd: true,
-                 scrub: 1.4,
-                 invalidateOnRefresh: true,
-               },
-             })
-               .to({}, { duration: 0.2 })
-               .to(routeTrack, { x: () => -distance(), duration: 0.6 }, 0.2)
-               .to(routeWhale, { x: whaleDistance, duration: 0.6 }, 0.2)
-               .to({}, { duration: 0.2 });
-           }
-        });
-       refreshFrame = window.requestAnimationFrame(() => ScrollTrigger.refresh());
-     });
-     return () => { disposed = true; window.cancelAnimationFrame(refreshFrame); ctx?.revert(); };
-  }, []);
+  function tabKey(event: KeyboardEvent<HTMLButtonElement>, index: number) {
+    let next = index;
+    if (event.key === "ArrowRight") next = (index + 1) % features.length;
+    else if (event.key === "ArrowLeft")
+      next = (index + features.length - 1) % features.length;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = features.length - 1;
+    else return;
+    event.preventDefault();
+    setFeature(next);
+    document.getElementById(`feature-tab-${next}`)?.focus();
+  }
 
   return (
-    <main id="top" className="landing-page min-h-[100dvh] bg-[#f6dbe2] text-[var(--ink)]">
-<header className={`sticky top-0 z-[100] transition-all duration-300 ${floatingNav ? "px-4 pt-3 sm:px-8" : "border-b border-[var(--line)] bg-white"}`}>
-        <div className={floatingNav ? "mx-auto max-w-7xl rounded-2xl border border-[var(--line)] bg-white/95 shadow-[0_12px_35px_rgba(32,48,34,0.14)] backdrop-blur-xl" : ""}>
-        <nav className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-5 sm:px-8" aria-label="Navigasi utama">
-          <Link href="/" className="flex items-center gap-2 font-display text-xl font-semibold tracking-tight text-[var(--ink)]"><Image src="/images/logo-mibudge.png" alt="" width={56} height={56} className="h-14 w-14 object-contain" priority />MiBudge</Link>
-          <div className="flex items-center gap-3">
-            <div className="flex border border-[var(--ink)]/20 p-0.5 text-xs font-semibold text-[var(--ink)]">
-              <button type="button" onClick={() => setLang("id")} className={lang === "id" ? "bg-[#f6dbe2] px-2 py-1 text-[var(--ink)]" : "px-2 py-1 text-[var(--ink-soft)]"}>ID</button>
-              <button type="button" onClick={() => setLang("en")} className={lang === "en" ? "bg-[#f6dbe2] px-2 py-1 text-[var(--ink)]" : "px-2 py-1 text-[var(--ink-soft)]"}>EN</button>
-            </div>
-            <Link href="/login" className="bg-[#f6dbe2] px-4 py-2 text-sm font-semibold text-[var(--ink)] transition-colors hover:bg-white/70">{t.login}</Link>
+    <div ref={root} className="mibudge" id="top">
+      <a href="#main-content" className="mb-skip">
+        Lewati navigasi
+      </a>
+      <header className="mb-header">
+        <div className="mb-container mb-nav">
+          <Link href="/" className="mb-brand" aria-label="Mibudge, beranda">
+            <span className="mb-brand-icon">
+              <WhaleCat cat={false} />
+            </span>
+            Mibudge<span className="mb-brand-dot">.</span>
+          </Link>
+          <nav className="mb-desktop-nav" aria-label="Navigasi utama">
+            <a href="#fitur">Kenalan dulu</a>
+            <a href="#simulasi">Coba budgeting</a>
+            <a href="#pertanyaan">Tanya jawab</a>
+          </nav>
+          <div className="mb-nav-actions">
+            <Link className="mb-login" href="/login">
+              Masuk <ArrowUpRight size={16} />
+            </Link>
+            <button
+              className="mb-menu-toggle"
+              aria-label={menuOpen ? "Tutup navigasi" : "Buka navigasi"}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-navigation"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? <X /> : <Menu />}
+            </button>
           </div>
-        </nav>
         </div>
+        {menuOpen && (
+          <nav
+            id="mobile-navigation"
+            className="mb-mobile-nav"
+            aria-label="Navigasi seluler"
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                setMenuOpen(false);
+                root.current
+                  ?.querySelector<HTMLButtonElement>(".mb-menu-toggle")
+                  ?.focus();
+              }
+            }}
+          >
+            <a href="#fitur" onClick={() => setMenuOpen(false)}>
+              Kenalan dulu
+            </a>
+            <a href="#simulasi" onClick={() => setMenuOpen(false)}>
+              Coba budgeting
+            </a>
+            <a href="#pertanyaan" onClick={() => setMenuOpen(false)}>
+              Tanya jawab
+            </a>
+          </nav>
+        )}
       </header>
-<div ref={heroTopRef} className="absolute top-0 h-px w-px" aria-hidden="true" />
-<section className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-gradient-to-b from-[#f6c5c1] to-[#f6dbe2] px-5 pt-16 sm:px-8">
-        <div className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col items-center py-10 text-center">
-          <div className="relative isolate flex w-full flex-col items-center">
-            <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[22rem] w-[42rem] -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_50%_50%,rgba(220,38,38,0.5)_0%,rgba(220,38,38,0.2)_50%,rgba(220,38,38,0)_72%)] blur-2xl sm:h-[26rem] sm:w-[56rem] lg:h-[30rem] lg:w-[72rem]" />
-            <h1 className="mx-auto mt-5 max-w-3xl font-display text-4xl font-semibold leading-[1.0] tracking-[-0.05em] text-balance text-[var(--ink)] sm:text-5xl lg:text-6xl">{t.hero} <span className="hero-accent-gradient">{t.heroAccent}</span></h1>
-            <p className="mx-auto mt-6 max-w-2xl text-base font-medium leading-7 text-[#6f3b45] sm:text-lg"><TypewriterEffectSmooth text={t.intro} /></p>
-            <div className="mt-8 flex justify-center">
-              <Link href="/login" className="btn btn-fill px-6 py-3.5 text-sm">{t.start}</Link>
+
+      <main id="main-content">
+        <section className="mb-hero mb-container" aria-labelledby="hero-title">
+          <div className="mb-hero-copy">
+            <div className="mb-hello">
+              <span className="mb-mini-spark">✳</span> Teman baik untuk uangmu
+            </div>
+            <h1 id="hero-title">
+              Boleh jajan.
+              <br />
+              Tetap punya
+              <br />
+              <span className="mb-underlined">
+                simpanan.
+                <svg
+                  viewBox="0 0 480 20"
+                  preserveAspectRatio="none"
+                  aria-hidden="true"
+                >
+                  <path d="M5 13Q240 -2 475 9M40 18Q240 5 440 17" />
+                </svg>
+              </span>
+            </h1>
+            <p>
+              Hidup bukan cuma soal menahan diri.
+              <br className="mb-desktop-break" /> Catat pengeluaran, sisihkan
+              untuk mimpi, dan nikmati hari ini dengan lebih tenang.
+            </p>
+            <div className="mb-hero-actions">
+              <Link href="/register" className="mb-button">
+                Mulai perjalananmu <ArrowUpRight size={19} />
+              </Link>
+              <a href="#fitur" className="mb-text-link">
+                Kenalan dulu <ArrowDown size={16} />
+              </a>
+            </div>
+            <div className="mb-hero-footnote">
+              <span>
+                <Check size={14} /> Mulai dari satu catatan
+              </span>
+              <span>
+                <Heart size={13} /> Tanpa menghakimi
+              </span>
             </div>
           </div>
-                     <aside className="mt-6 aspect-video h-auto w-full translate-y-4 overflow-hidden rounded-[1.75rem] border border-[var(--line)] bg-[var(--paper)] text-left shadow-[0_0_26px_rgba(220,38,38,0.28),0_24px_55px_rgba(74,92,54,0.16)] sm:mt-8 sm:translate-y-6" aria-label="Pratinjau dashboard MiBudge">
-            <div className="flex items-center justify-between border-b border-[var(--line)] px-5 py-4 sm:px-7"><div className="flex items-center gap-3"><span className="grid h-8 w-8 place-items-center bg-[var(--sage)] font-display font-semibold">M</span><span className="font-display text-lg font-semibold">MiBudge</span></div><span className="text-sm text-[var(--ink-soft)]">Ringkasan bulan ini</span></div>
-            <div className="grid h-full min-h-0 md:grid-cols-[13rem_1fr]">
-              <div className="hidden border-r border-[var(--line)] bg-[var(--rose)]/45 p-6 md:block"><p className="text-sm font-medium">Catatanmu</p><div className="mt-8 space-y-3"><div className="h-2 w-20 bg-[var(--ink)]/15" /><div className="h-2 w-28 bg-[var(--ink)]/10" /><div className="h-2 w-16 bg-[var(--ink)]/10" /></div></div>
-              <div className="flex min-h-0 flex-col justify-between overflow-hidden p-6 sm:p-8"><div><div className="flex items-start justify-between"><div><p className="text-sm text-[var(--ink-soft)]">Prioritas sekarang</p><h2 className="mt-1 font-display text-3xl font-semibold tracking-tight">Lihat yang perlu dicatat.</h2></div><span className="hidden bg-[var(--cream)] px-3 py-1 text-sm font-medium sm:block">Hari ini</span></div><div className="mt-10 grid gap-4 sm:grid-cols-[1.4fr_1fr]"><div className="bg-[var(--sage)]/35 p-5"><p className="text-sm font-medium">Sisa anggaran</p><div className="mt-10 h-2 w-full bg-[var(--ink)]/10"><div className="h-full w-3/5 bg-[var(--sage-deep)]" /></div></div><div className="border-t border-[var(--line)] p-5 sm:border-l sm:border-t-0"><p className="text-sm font-medium">Berikutnya</p><p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">Tambahkan pengeluaran atau perbarui target tabungan.</p></div></div></div><div className="mt-10 border-t border-[var(--line)] pt-5 text-sm text-[var(--ink-soft)]">Pratinjau dashboard. Tempatkan screenshot dashboard asli pada area ini saat tersedia.</div></div>
+          <div className="mb-scene">
+            <div className="mb-scene-orbit" aria-hidden="true" />
+            <div className="mb-hand-note mb-scene-note">
+              sedikit dicatat,
+              <br />
+              banyak tenangnya{" "}
+              <svg viewBox="0 0 80 60" aria-hidden="true">
+                <path d="M6 5Q70 0 65 46M52 36L65 48L76 34" />
+              </svg>
             </div>
-          </aside>
-        </div>
-        <div className="h-10 sm:h-16" />
-      </section>
-
-
-       <section className="budget-route relative z-20 mt-16 px-5 pb-0 pt-20 text-[var(--bg)] sm:mt-24 sm:px-8 lg:pt-28" aria-labelledby="flow-heading">
-         <div className="relative mx-auto max-w-7xl">
-           <header className="max-w-xl">
-             <p className="text-sm font-medium text-[var(--cream)]/75">MiBudge / langkah berikutnya</p>
-             <h2 id="flow-heading" className="mt-3 font-display text-4xl font-semibold leading-tight tracking-tight sm:text-6xl">{t.flow}</h2>
-             <p className="mt-5 leading-7 text-white/75">{t.flowIntro}</p>
-            </header>
-             <div className="budget-route-viewport mt-12">
-              <div className="budget-route-water" aria-hidden="true"><span /><span /><span /></div>
-              <div className="budget-route-whale" aria-hidden="true">
-                <Lottie animationData={whaleSwim} loop />
+            <div className="mb-budget-paper">
+              <div className="mb-paper-tape" aria-hidden="true" />
+              <div className="mb-paper-heading">
+                <span>Ruang uangku</span>
+                <Flower />
               </div>
-              <ol className="budget-route-track">
-                {t.steps.concat([t.close]).map((step, index) => (
-                  <li key={step} className="budget-route-step">
-                    <article className="budget-route-card">
-                      <span className="budget-route-index">0{index + 1}</span>
-                      <p>{step}</p>
-                    </article>
-                  </li>
-                ))}
-              </ol>
+              <p>Untuk hari ini & nanti</p>
+              <div className="mb-paper-amount">
+                Rp5.000.000<span>Contoh anggaran bulanan</span>
+              </div>
+              <div
+                className="mb-stacked-bar"
+                aria-label="50 persen kebutuhan, 30 persen keinginan, 20 persen tabungan"
+              >
+                <i />
+                <i />
+                <i />
+              </div>
+              <div className="mb-paper-row">
+                <span>
+                  <i className="mb-dot mb-dot-sage" /> Kebutuhan
+                </span>
+                <b>50%</b>
+              </div>
+              <div className="mb-paper-row">
+                <span>
+                  <i className="mb-dot mb-dot-peach" /> Keinginan
+                </span>
+                <b>30%</b>
+              </div>
+              <div className="mb-paper-row">
+                <span>
+                  <i className="mb-dot mb-dot-rose" /> Tabungan
+                </span>
+                <b>20%</b>
+              </div>
+              <div className="mb-paper-bottom">
+                <Check size={14} /> Ada ruang buat hal yang kamu suka.
+              </div>
             </div>
+            <div className="mb-mini-receipt">
+              <Heart size={20} />
+              <span>
+                Wishlist pertamaku<b>Pelan-pelan, kebeli.</b>
+              </span>
+              <span className="mb-receipt-star">✧</span>
+            </div>
+            <Flower className="mb-scene-flower" />
+            <span className="mb-scene-spark" aria-hidden="true">
+              ✧
+            </span>
+            <WhaleCat className="mb-hero-mascot" />
+            <div className="mb-scene-caption">teman kecil, mimpi besar.</div>
+            <button
+              className="mb-motion-toggle"
+              aria-label={
+                paused ? "Putar animasi maskot" : "Jeda animasi maskot"
+              }
+              aria-pressed={paused}
+              onClick={() => setPaused(!paused)}
+            >
+              {paused ? <Play size={14} /> : <Pause size={14} />}
+            </button>
           </div>
-       </section>
-
-         <section className="relative overflow-hidden border-0 bg-[#f6dbe2] pb-8 pt-4 shadow-none sm:py-6" aria-label="Teknologi yang digunakan">
-          <div className="mx-auto max-w-7xl px-5 sm:px-8"><p className="font-display text-3xl font-semibold tracking-tight">Dibuat dengan teknologi</p></div>
-          <div className="mt-8 overflow-hidden px-2"><div className="tech-marquee flex w-max items-center gap-20 px-8 py-6">{techStack.concat(techStack, techStack, techStack).map(([name, src], index) => <div key={`${name as string}-${index}`} className="tech-logo group flex min-w-48 flex-col items-center gap-3 rounded-2xl px-8 pt-12 pb-4 text-sm font-semibold text-[var(--ink)]"><span className="grid h-16 w-16 place-items-center drop-shadow-[0_0_38px_rgba(220,38,38,0.9)] transition-transform duration-300 group-hover:-translate-y-1 group-hover:scale-[1.12] group-hover:drop-shadow-[0_0_64px_rgba(220,38,38,1)]">{src ? <Image src={src as string} alt={`${name} logo`} width={64} height={64} className="h-16 w-16 object-contain" /> : <FontAwesomeIcon icon={faArrowsRotate} className="text-4xl text-[var(--sage-deep)]" />}</span><span>{name as string}</span></div>)}</div></div>
         </section>
 
+        <div
+          className="mb-ribbon"
+          aria-label="Untuk hal-hal yang berarti buatmu"
+        >
+          <div className="mb-container">
+            <span>Kopi hari ini</span>
+            <Flower />
+            <span>Skincare favorit</span>
+            <Flower />
+            <span>Liburan nanti</span>
+            <Flower />
+            <span>Masa depanmu</span>
+            <Flower />
+          </div>
+        </div>
 
-        <section className="rounded-[2.5rem] bg-[#f6c5c1] px-5 py-24 sm:rounded-[4rem] sm:px-8 lg:py-32"><div className="mx-auto max-w-7xl"><h2 className="max-w-3xl font-display text-5xl font-semibold leading-tight tracking-tight sm:text-7xl">Mulai dengan satu catatan.</h2><p className="mt-6 max-w-lg text-base leading-7 text-[var(--ink-soft)]">Tidak perlu menata semuanya sekaligus. Masuk, catat pengeluaran pertama, lalu lanjutkan dari sana.</p><Link href="/login" className="btn btn-primary mt-9 px-6 py-3.5 text-sm">{t.start}</Link></div></section>
+        <section
+          id="fitur"
+          className="mb-features mb-container"
+          aria-labelledby="features-title"
+        >
+          <div className="mb-section-top">
+            <p className="mb-section-label">
+              <span /> Satu tempat, banyak rencana
+            </p>
+            <h2 id="features-title">
+              Untuk hidupmu
+              <br />
+              yang banyak maunya.
+            </h2>
+            <p>
+              Yang perlu dibeli. Yang ingin dimiliki.
+              <br />
+              Semuanya boleh punya ruang sendiri.
+            </p>
+          </div>
+          <div className="mb-feature-layout">
+            <div className="mb-feature-copy">
+              <div
+                className="mb-tabs"
+                role="tablist"
+                aria-label="Jelajahi fitur Mibudge"
+              >
+                {features.map((item, index) => (
+                  <button
+                    key={item.label}
+                    id={`feature-tab-${index}`}
+                    role="tab"
+                    aria-selected={feature === index}
+                    aria-controls="feature-panel"
+                    tabIndex={feature === index ? 0 : -1}
+                    onClick={() => setFeature(index)}
+                    onKeyDown={(event) => tabKey(event, index)}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+              <div className="mb-feature-description">
+                <h3>{selected.title}</h3>
+                <p>{selected.description}</p>
+                <Link href="/register" className="mb-text-link">
+                  Bikin catatan pertamamu <ArrowUpRight size={18} />
+                </Link>
+              </div>
+              <div className="mb-feature-note">
+                <LittleCat />
+                <span className="mb-hand-note">{selected.note}</span>
+              </div>
+            </div>
+            <div
+              className="mb-notebook"
+              role="tabpanel"
+              id="feature-panel"
+              aria-labelledby={`feature-tab-${feature}`}
+              tabIndex={0}
+            >
+              <div className="mb-notebook-rings" aria-hidden="true">
+                {Array.from({ length: 7 }, (_, i) => (
+                  <i key={i} />
+                ))}
+              </div>
+              <div ref={demo} className="mb-demo-content">
+                <div className="mb-demo-heading">
+                  <div>
+                    <span>Contoh catatan</span>
+                    <h4>{selected.heading}</h4>
+                  </div>
+                  <span className="mb-demo-stamp">
+                    <Sprout size={22} />
+                  </span>
+                </div>
+                <div className="mb-demo-rows">
+                  {selected.rows.map((row, index) => (
+                    <div className="mb-demo-row" key={row.name}>
+                      <span className={`mb-demo-icon mb-demo-icon-${index}`}>
+                        <row.icon size={20} strokeWidth={1.6} />
+                      </span>
+                      <div>
+                        <b>{row.name}</b>
+                        <small>{row.category}</small>
+                      </div>
+                      <strong>{row.amount}</strong>
+                    </div>
+                  ))}
+                </div>
+                <div className="mb-demo-total">
+                  <span>{selected.totalLabel}</span>
+                  <b>{selected.total}</b>
+                </div>
+                <p className="mb-demo-caption">
+                  Catatan kecil hari ini, lebih paham diri sendiri.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
 
-        <footer className="px-5 py-6 text-sm text-[var(--ink-soft)] sm:px-8"><div className="mx-auto flex max-w-7xl justify-between"><span>{t.footer}</span><a href="#top">↑</a></div></footer>
-    </main>
+        <section
+          id="simulasi"
+          className="mb-simulation"
+          aria-labelledby="simulation-title"
+        >
+          <div className="mb-container mb-simulation-grid">
+            <div className="mb-simulation-copy">
+              <span className="mb-section-label">
+                <span /> Coba dulu, yuk
+              </span>
+              <h2 id="simulation-title">
+                Uangmu punya
+                <br />
+                banyak tujuan.
+              </h2>
+              <p>
+                Coba bagi anggaran bulananmu. Ada untuk kebutuhan, untuk
+                senang-senang, dan untuk diri kamu di masa depan.
+              </p>
+              <Flower className="mb-simulation-flower" />
+              <p className="mb-hand-note">
+                Sedikit untuk nanti,
+                <br />
+                berarti banget suatu hari.
+              </p>
+            </div>
+            <div className="mb-calculator">
+              <div className="mb-calculator-label">
+                <label htmlFor="monthly-budget">Anggaran bulananmu</label>
+                <Wallet size={21} />
+              </div>
+              <output htmlFor="monthly-budget" className="mb-income">
+                {rupiah(income)}
+              </output>
+              <input
+                id="monthly-budget"
+                type="range"
+                min="1000000"
+                max="15000000"
+                step="500000"
+                value={income}
+                onChange={(event) => setIncome(Number(event.target.value))}
+                aria-valuetext={rupiah(income)}
+                style={
+                  {
+                    "--range-progress": `${(income - 1000000) / 140000}%`,
+                  } as CSSProperties
+                }
+              />
+              <div className="mb-range-labels">
+                <span>Rp1 juta</span>
+                <span>Rp15 juta</span>
+              </div>
+              <div
+                className="mb-allocation"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                <div>
+                  <span>
+                    <i className="mb-dot mb-dot-sage" /> Kebutuhan{" "}
+                    <small>50%</small>
+                  </span>
+                  <b>{rupiah(income * 0.5)}</b>
+                </div>
+                <div>
+                  <span>
+                    <i className="mb-dot mb-dot-peach" /> Keinginan{" "}
+                    <small>30%</small>
+                  </span>
+                  <b>{rupiah(income * 0.3)}</b>
+                </div>
+                <div>
+                  <span>
+                    <i className="mb-dot mb-dot-rose" /> Tabungan{" "}
+                    <small>20%</small>
+                  </span>
+                  <b>{rupiah(income * 0.2)}</b>
+                </div>
+              </div>
+              <p className="mb-calculator-note">
+                Contoh pembagian 50/30/20, bukan aturan wajib.
+                <br />
+                Sesuaikan dengan kebutuhan dan keadaanmu.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="mb-how mb-container" aria-labelledby="how-title">
+          <div className="mb-how-heading">
+            <h2 id="how-title">
+              Nggak harus langsung jago.
+              <br />
+              Mulai aja dulu.
+            </h2>
+            <span className="mb-hand-note">
+              Satu langkah kecil juga kemajuan ♡
+            </span>
+          </div>
+          <ol className="mb-steps">
+            <li>
+              <span className="mb-step-number">1</span>
+              <h3>Kenalan, yuk.</h3>
+              <p>
+                Buat akunmu. Siapkan ruang kecil untuk semua rencana besarmu.
+              </p>
+            </li>
+            <li>
+              <span className="mb-step-number">2</span>
+              <h3>Catat yang hari ini.</h3>
+              <p>
+                Mulai dari kopi pagi atau belanja bulanan. Satu catatan juga
+                berarti.
+              </p>
+            </li>
+            <li>
+              <span className="mb-step-number">3</span>
+              <h3>Pelan-pelan, jadi kebiasaan.</h3>
+              <p>
+                Lihat pengeluaranmu, atur kebutuhan, dan sisihkan untuk
+                wishlist.
+              </p>
+            </li>
+          </ol>
+        </section>
+
+        <section
+          id="pertanyaan"
+          className="mb-faq mb-container"
+          aria-labelledby="faq-title"
+        >
+          <div>
+            <span className="mb-section-label">
+              <span /> Masih penasaran?
+            </span>
+            <h2 id="faq-title">
+              Kenalan
+              <br />
+              lebih dekat.
+            </h2>
+            <LittleCat className="mb-faq-cat" />
+          </div>
+          <div className="mb-faq-list">
+            {questions.map(([question, answer]) => (
+              <details key={question}>
+                <summary>
+                  {question}
+                  <Plus size={19} />
+                </summary>
+                <p>{answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-closing">
+          <div className="mb-container mb-closing-inner">
+            <div>
+              <span className="mb-hand-note">
+                Untuk kamu, dan semua rencanamu.
+              </span>
+              <h2>
+                Yuk, bikin uangmu
+                <br />
+                lebih terarah.
+              </h2>
+              <Link href="/register" className="mb-button">
+                Mulai bareng Mibudge <ArrowUpRight size={19} />
+              </Link>
+            </div>
+            <div className="mb-closing-art">
+              <Flower />
+              <WhaleCat />
+              <span className="mb-hand-note">kita mulai bareng, ya?</span>
+            </div>
+          </div>
+        </section>
+      </main>
+      <footer className="mb-footer mb-container">
+        <div>
+          <Link href="/" className="mb-brand">
+            Mibudge.
+          </Link>
+          <p>Catatan kecil. Langkah baik.</p>
+        </div>
+        <div className="mb-footer-right">
+          <a href="#top">
+            Kembali ke atas <ArrowUpRight size={15} />
+          </a>
+          <span>Dibuat dengan hati, untuk hari-harimu.</span>
+        </div>
+      </footer>
+    </div>
   );
 }
